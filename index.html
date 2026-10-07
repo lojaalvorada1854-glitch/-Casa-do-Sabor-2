@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f2c400">
+<title>Casa do Sabor</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f5f5f5;
+  color:#222;
+}
+header{
+  background:#f2c400;
+  color:#111;
+  padding:18px;
+  text-align:center;
+  font-weight:bold;
+  box-shadow:0 2px 8px #999;
+}
+header h1{margin:0;font-size:26px}
+header p{margin:5px 0 0}
+
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:15px;
+}
+
+.menu{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:10px;
+  margin-bottom:20px;
+}
+
+button{
+  border:0;
+  border-radius:10px;
+  padding:13px;
+  font-size:15px;
+  font-weight:bold;
+  cursor:pointer;
+  background:#222;
+  color:white;
+}
+
+button:hover{opacity:.9}
+
+.btn-yellow{
+  background:#f2c400;
+  color:#111;
+}
+
+.btn-brown{
+  background:#704214;
+  color:white;
+}
+
+.section{
+  display:none;
+  background:white;
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 2px 8px #ccc;
+  margin-bottom:20px;
+}
+
+.section.active{display:block}
+
+h2{
+  margin-top:0;
+  color:#704214;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;
+}
+
+.card{
+  background:#fafafa;
+  border:2px solid #ddd;
+  border-radius:12px;
+  padding:15px;
+  text-align:center;
+}
+
+.card strong{
+  display:block;
+  font-size:20px;
+  margin-bottom:8px;
+}
+
+.tables{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
+  gap:10px;
+}
+
+.table{
+  padding:16px 8px;
+  border-radius:12px;
+  text-align:center;
+  background:#e9e9e9;
+  border:2px solid #ccc;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.table.open{
+  background:#f2c400;
+  border-color:#704214;
+}
+
+input,select{
+  width:100%;
+  padding:12px;
+  margin:6px 0 12px;
+  border:1px solid #bbb;
+  border-radius:8px;
+  font-size:16px;
+}
+
+.order-box{
+  background:#fff8d6;
+  border:1px solid #e1c000;
+  border-radius:10px;
+  padding:12px;
+  margin-top:12px;
+}
+
+.total{
+  font-size:24px;
+  font-weight:bold;
+  text-align:right;
+  margin:15px 0;
+}
+
+footer{
+  text-align:center;
+  padding:20px;
+  color:#666;
+}
+
+.small{
+  font-size:13px;
+  color:#666;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🍽️ CASA DO SABOR</h1>
+  <p>Sistema de Gestão</p>
+</header>
+
+<div class="container">
+
+  <div class="menu">
+    <button class="btn-yellow" onclick="show('inicio')">🏠 Início</button>
+    <button onclick="show('mesas')">🪑 Mesas</button>
+    <button onclick="show('pedidos')">🧾 Pedidos</button>
+    <button onclick="show('caixa')">💰 Caixa</button>
+    <button onclick="show('produtos')">🍛 Produtos</button>
+    <button onclick="show('estoque')">📦 Estoque</button>
+    <button onclick="show('compras')">🛒 Compras</button>
+    <button onclick="show('delivery')">🛵 Delivery</button>
+    <button onclick="show('financeiro')">📊 Financeiro</button>
+  </div>
+
+  <!-- INÍCIO -->
+  <section id="inicio" class="section active">
+    <h2>Painel Casa do Sabor</h2>
+
+    <div class="cards">
+      <div class="card">
+        <strong>35</strong>
+        Mesas
+      </div>
+
+      <div class="card">
+        <strong id="mesasAbertas">0</strong>
+        Mesas abertas
+      </div>
+
+      <div class="card">
+        <strong id="totalVendas">R$ 0,00</strong>
+        Vendas
+      </div>
+
+      <div class="card">
+        <strong id="totalCaixa">R$ 0,00</strong>
+        Caixa
+      </div>
+    </div>
+
+    <div class="order-box">
+      <b>Bem-vindo ao Casa do Sabor!</b>
+      <p>
+        Sistema preparado para funcionar no celular, tablet e computador.
+      </p>
+    </div>
+  </section>
+
+  <!-- MESAS -->
+  <section id="mesas" class="section">
+    <h2>🪑 Mesas 1 a 35</h2>
+    <p class="small">Cada mesa possui 4 cadeiras: A, B, C e D.</p>
+
+    <div class="tables" id="tables"></div>
+
+    <div id="mesaDetalhes" class="order-box" style="display:none">
+      <h3 id="mesaTitulo"></h3>
+
+      <label>Cadeira</label>
+      <select id="cadeira">
+        <option>A</option>
+        <option>B</option>
+        <option>C</option>
+        <option>D</option>
+      </select>
+
+      <label>Produto</label>
+      <select id="produtoMesa">
+        <option value="PF|25">PF — R$ 25,00</option>
+        <option value="Guaraná|6">Guaraná — R$ 6,00</option>
+        <option value="Salgado|10">Salgado — R$ 10,00</option>
+        <option value="Sorvete|6">Sorvete — R$ 6,00</option>
+        <option value="Coca-Cola 2L|15">Coca-Cola 2L — R$ 15,00</option>
+        <option value="Coca-Cola Lata|6">Coca-Cola Lata — R$ 6,00</option>
+      </select>
+
+      <button class="btn-brown" onclick="adicionarPedido()">
+        ➕ Adicionar pedido
+      </button>
+
+      <div id="pedidoMesa"></div>
+
+      <div class="total">
+        Total: <span id="totalMesa">R$ 0,00</span>
+      </div>
+
+      <button class="btn-yellow" onclick="fecharMesa()">
+        💰 Fechar mesa
+      </button>
+    </div>
+  </section>
+
+  <!-- PEDIDOS -->
+  <section id="pedidos" class="section">
+    <h2>🧾 Pedidos</h2>
+
+    <div class="cards">
+      <div class="card">
+        <strong id="pedidosHoje">0</strong>
+        Pedidos hoje
+      </div>
+
+      <div class="card">
+        <strong>🍳</strong>
+        Cozinha
+        <p class="small">Pedidos para produção</p>
+      </div>
+
+      <div class="card">
+        <strong>🛵</strong>
+        Delivery
+        <p class="small">Pedidos para entrega</p>
+      </div>
+    </div>
+
+    <div class="order-box">
+      <h3>Comanda de produção</h3>
+      <p>Os pedidos das mesas podem ser enviados para a cozinha.</p>
+      <button onclick="alert('Pedido enviado para a cozinha!')">
+        👨‍🍳 Enviar para cozinha
+      </button>
+    </div>
+  </section>
+
+  <!-- CAIXA -->
+  <section id="caixa" class="section">
+    <h2>💰 Caixa e pagamentos</h2>
+
+    <label>Valor recebido</label>
+    <input id="valorRecebido" type="number" step="0.01" placeholder="0,00">
+
+    <label>Forma de pagamento</label>
+    <select id="formaPagamento">
+      <option>Dinheiro</option>
+      <option>Pix</option>
+      <option>Cartão de débito</option>
+      <option>Cartão de crédito</option>
+    </select>
+
+    <button class="btn-yellow" onclick="registrarPagamento()">
+      Registrar pagamento
+    </button>
+
+    <div class="total">
+      Caixa: <span id="caixaValor">R$ 0,00</span>
+    </div>
+
+    <div id="pagamentos"></div>
+  </section>
+
+  <!-- PRODUTOS -->
+  <section id="produtos" class="section">
+    <h2>🍛 Cadastro de Produtos</h2>
+
+    <label>Nome do produto</label>
+    <input id="novoProduto" placeholder="Ex.: Arroz, Feijão, PF...">
+
+    <label>Preço</label>
+    <input id="novoPreco" type="number" step="0.01" placeholder="0,00">
+
+    <button class="btn-brown" onclick="cadastrarProduto()">
+      ➕ Cadastrar produto
+    </button>
+
+    <div id="listaProdutos" class="order-box"></div>
+  </section>
+
+  <!-- ESTOQUE -->
+  <section id="estoque" class="section">
+    <h2>📦 Controle de Estoque</h2>
+
+    <label>Mercadoria</label>
+    <input id="mercadoria" placeholder="Ex.: Arroz">
+
+    <label>Quantidade</label>
+    <input id="quantidade" type="number" placeholder="0">
+
+    <button onclick="adicionarEstoque()">
+      📦 Lançar estoque
+    </button>
+
+    <div id="listaEstoque" class="order-box"></div>
+  </section>
+
+  <!-- COMPRAS -->
+  <section id="compras" class="section">
+    <h2>🛒 Compras e Fornecedores</h2>
+
+    <label>Fornecedor</label>
+    <input id="fornecedor" placeholder="Nome do fornecedor">
+
+    <label>Mercadoria</label>
+    <input id="compraMercadoria" placeholder="Produto comprado">
+
+    <label>Valor da compra</label>
+    <input id="valorCompra" type="number" step="0.01" placeholder="0,00">
+
+    <label>Vencimento</label>
+    <input id="vencimento" type="date">
+
+    <button class="btn-brown" onclick="registrarCompra()">
+      🛒 Registrar compra
+    </button>
+
+    <div id="listaCompras" class="order-box"></div>
+  </section>
+
+  <!-- DELIVERY -->
+  <section id="delivery" class="section">
+    <h2>🛵 Delivery</h2>
+
+    <label>Cliente</label>
+    <input id="clienteDelivery" placeholder="Nome do cliente">
+
+    <label>Endereço</label>
+    <input id="enderecoDelivery" placeholder="Endereço de entrega">
+
+    <label>Entregador</label>
+    <input id="entregador" placeholder="Nome do entregador">
+
+    <label>Taxa de entrega</label>
+    <input id="taxaDelivery" type="number" step="0.01" placeholder="0,00">
+
+    <button onclick="registrarDelivery()">
+      🛵 Registrar entrega
+    </button>
+
+    <div id="listaDelivery" class="order-box"></div>
+  </section>
+
+  <!-- FINANCEIRO -->
+  <section id="financeiro" class="section">
+    <h2>📊 Financeiro</h2>
+
+    <div class="cards">
+      <div class="card">
+        <strong id="financeiroVendas">R$ 0,00</strong>
+        Receitas
+      </div>
+
+      <div class="card">
+        <strong id="financeiroCompras">R$ 0,00</strong>
+        Compras
+      </div>
+
+      <div class="card">
+        <strong id="financeiroSaldo">R$ 0,00</strong>
+        Saldo
+      </div>
+    </div>
+
+    <div class="order-box">
+      <h3>Resumo gerencial</h3>
+      <p>Receitas, compras e saldo do período.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Casa do Sabor © 2026
+</footer>
+
+<script>
+let mesaSelecionada = null;
+let pedidos = {};
+let caixa = 0;
+let vendas = 0;
+let comprasTotal = 0;
+let produtos = [
+  ["PF",25],
+  ["Guaraná",6],
+  ["Salgado",10],
+  ["Sorvete",6],
+  ["Coca-Cola 2L",15],
+  ["Coca-Cola Lata",6]
+];
+let estoque = [];
+let compras = [];
+let deliveries = [];
+
+function moeda(valor){
+  return Number(valor).toLocaleString("pt-BR",{
+    style:"currency",
+    currency:"BRL"
+  });
+}
+
+function show(id){
+  document.querySelectorAll(".section").forEach(s=>{
+    s.classList.remove("active");
+  });
+
+  document.getElementById(id).classList.add("active");
+
+  atualizarDashboard();
+}
+
+function criarMesas(){
+  const area=document.getElementById("tables");
+
+  for(let i=1;i<=35;i++){
+    const div=document.createElement("div");
+    div.className="table";
+    div.id="mesa-"+i;
+    div.innerHTML="Mesa "+i;
+    div.onclick=()=>abrirMesa(i);
+    area.appendChild(div);
+  }
+}
+
+function abrirMesa(numero){
+  mesaSelecionada=numero;
+
+  if(!pedidos[numero]){
+    pedidos[numero]=[];
+  }
+
+  document.getElementById("mesaDetalhes").style.display="block";
+  document.getElementById("mesaTitulo").innerText="Mesa "+numero;
+
+  atualizarPedidoMesa();
+
+  document.getElementById("mesaDetalhes")
+    .scrollIntoView({behavior:"smooth"});
+}
+
+function adicionarPedido(){
+  if(!mesaSelecionada) return;
+
+  const cadeira=document.getElementById("cadeira").value;
+  const dados=document.getElementById("produtoMesa").value.split("|");
+
+  const nome=dados[0];
+  const preco=Number(dados[1]);
+
+  pedidos[mesaSelecionada].push({
+    cadeira,
+    nome,
+    preco
+  });
+
+  document.getElementById("mesa-"+mesaSelecionada)
+    .classList.add("open");
+
+  atualizarPedidoMesa();
+  atualizarDashboard();
+}
+
+function atualizarPedidoMesa(){
+  const area=document.getElementById("pedidoMesa");
+
+  if(!mesaSelecionada || !pedidos[mesaSelecionada]){
+    area.innerHTML="";
+    return;
+  }
+
+  let total=0;
+  let html="<h3>Pedidos da Mesa</h3>";
+
+  pedidos[mesaSelecionada].forEach((p,index)=>{
+    total+=p.preco;
+
+    html+=`
+      <div class="card" style="margin-bottom:8px">
+        Cadeira ${p.cadeira}<br>
+        <b>${p.nome}</b><br>
+        ${moeda(p.preco)}
+        <br>
+        <button onclick="removerPedido(${index})">Excluir</button>
+      </div>
+    `;
+  });
+
+  area.innerHTML=html;
+  document.getElementById("totalMesa").innerText=moeda(total);
+}
+
+function removerPedido(index){
+  pedidos[mesaSelecionada].splice(index,1);
+  atualizarPedidoMesa();
+}
+
+function fecharMesa(){
+  if(!mesaSelecionada) return;
+
+  const lista=pedidos[mesaSelecionada] || [];
+  const total=lista.reduce((s,p)=>s+p.preco,0);
+
+  if(total<=0){
+    alert("Essa mesa não possui pedidos.");
+    return;
+  }
+
+  const forma=prompt(
+    "Forma de pagamento:\n\n1 - Dinheiro\n2 - Pix\n3 - Débito\n4 - Crédito"
+  );
+
+  if(!forma) return;
+
+  vendas+=total;
+  caixa+=total;
+
+  alert(
+    "Mesa "+mesaSelecionada+
+    " fechada!\n\nTotal: "+moeda(total)
+  );
+
+  pedidos[mesaSelecionada]=[];
+
+  document.getElementById("mesa-"+mesaSelecionada)
+    .classList.remove("open");
+
+  atualizarPedidoMesa();
+  atualizarDashboard();
+}
+
+function registrarPagamento(){
+  const valor=Number(
+    document.getElementById("valorRecebido").value
+  );
+
+  if(valor<=0){
+    alert("Digite um valor válido.");
+    return;
+  }
+
+  const forma=document.getElementById("formaPagamento").value;
+
+  caixa+=valor;
+  vendas+=valor;
+
+  const area=document.getElementById("pagamentos");
+
+  area.innerHTML+=`
+    <div class="order-box">
+      ${forma} — ${moeda(valor)}
+    </div>
+  `;
+
+  document.getElementById("valorRecebido").value="";
+
+  atualizarDashboard();
+}
+
+function cadastrarProduto(){
+  const nome=document.getElementById("novoProduto").value.trim();
+  const preco=Number(document.getElementById("novoPreco").value);
+
+  if(!nome || preco<=0){
+    alert("Informe nome e preço.");
+    return;
+  }
+
+  produtos.push([nome,preco]);
+
+  document.getElementById("novoProduto").value="";
+  document.getElementById("novoPreco").value="";
+
+  mostrarProdutos();
+
+  alert("Produto cadastrado!");
+}
+
+function mostrarProdutos(){
+  const area=document.getElementById("listaProdutos");
+
+  area.innerHTML=produtos.map((p,i)=>`
+    <div style="padding:8px;border-bottom:1px solid #ddd">
+      <b>${p[0]}</b> — ${moeda(p[1])}
+    </div>
+  `).join("");
+}
+
+function adicionarEstoque(){
+  const nome=document.getElementById("mercadoria").value.trim();
+  const quantidade=Number(
+    document.getElementById("quantidade").value
+  );
+
+  if(!nome || quantidade<=0){
+    alert("Informe a mercadoria e a quantidade.");
+    return;
+  }
+
+  estoque.push({nome,quantidade});
+
+  document.getElementById("mercadoria").value="";
+  document.getElementById("quantidade").value="";
+
+  mostrarEstoque();
+}
+
+function mostrarEstoque(){
+  document.getElementById("listaEstoque").innerHTML=
+    estoque.map(e=>`
+      <div style="padding:8px;border-bottom:1px solid #ddd">
+        📦 <b>${e.nome}</b> — ${e.quantidade}
+      </div>
+    `).join("");
+}
+
+function registrarCompra(){
+  const fornecedor=document.getElementById("fornecedor").value;
+  const mercadoria=document.getElementById("compraMercadoria").value;
+  const valor=Number(document.getElementById("valorCompra").value);
+  const vencimento=document.getElementById("vencimento").value;
+
+  if(!fornecedor || !mercadoria || valor<=0){
+    alert("Preencha os dados da compra.");
+    return;
+  }
+
+  compras.push({
+    fornecedor,
+    mercadoria,
+    valor,
+    vencimento
+  });
+
+  comprasTotal+=valor;
+
+  document.getElementById("listaCompras").innerHTML=
+    compras.map(c=>`
+      <div class="order-box">
+        <b>${c.fornecedor}</b><br>
+        ${c.mercadoria}<br>
+        ${moeda(c.valor)}<br>
+        Vencimento: ${c.vencimento || "não informado"}
+      </div>
+    `).join("");
+
+  atualizarDashboard();
+}
+
+function registrarDelivery(){
+  const cliente=document.getElementById("clienteDelivery").value;
+  const endereco=document.getElementById("enderecoDelivery").value;
+  const entregador=document.getElementById("entregador").value;
+  const taxa=Number(document.getElementById("taxaDelivery").value);
+
+  if(!cliente || !endereco){
+    alert("Informe cliente e endereço.");
+    return;
+  }
+
+  deliveries.push({
+    cliente,
+    endereco,
+    entregador,
+    taxa
+  });
+
+  document.getElementById("listaDelivery").innerHTML=
+    deliveries.map(d=>`
+      <div class="order-box">
+        <b>${d.cliente}</b><br>
+        📍 ${d.endereco}<br>
+        🛵 ${d.entregador || "Não informado"}<br>
+        Taxa: ${moeda(d.taxa)}
+      </div>
+    `).join("");
+
+  document.getElementById("clienteDelivery").value="";
+  document.getElementById("enderecoDelivery").value="";
+  document.getElementById("entregador").value="";
+  document.getElementById("taxaDelivery").value="";
+}
+
+function atualizarDashboard(){
+  const abertas=Object.keys(pedidos).filter(m=>{
+    return pedidos[m] && pedidos[m].length>0;
+  }).length;
+
+  document.getElementById("mesasAbertas").innerText=abertas;
+  document.getElementById("totalVendas").innerText=moeda(vendas);
+  document.getElementById("totalCaixa").innerText=moeda(caixa);
+  document.getElementById("caixaValor").innerText=moeda(caixa);
+
+  document.getElementById("financeiroVendas").innerText=
+    moeda(vendas);
+
+  document.getElementById("financeiroCompras").innerText=
+    moeda(comprasTotal);
+
+  document.getElementById("financeiroSaldo").innerText=
+    moeda(vendas-comprasTotal);
+
+  const quantidadePedidos=Object.values(pedidos)
+    .reduce((total,lista)=>total+(lista?.length || 0),0);
+
+  document.getElementById("pedidosHoje").innerText=
+    quantidadePedidos;
+}
+
+criarMesas();
+mostrarProdutos();
+mostrarEstoque();
+atualizarDashboard();
+</script>
+
+</body>
+</html>
